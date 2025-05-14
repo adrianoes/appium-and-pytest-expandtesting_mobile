@@ -1,0 +1,18 @@
+{
+  "name": "appium-and-pytest-expandtesting_mobile",
+  "version": "1.0.0",
+  "description": "UI testing in ApiClient apk using [expandtesting](https://practice.expandtesting.com/notes/api/api-docs/). This project contains basic examples on how to use Appium and Robot Framework to test UI tests. Good practices such as hooks, custom commands and tags, among others, are used. All the necessary support documentation to develop this project is placed here.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "appium": "^2.18.0",
+    "appium-doctor": "^1.16.2"
+  },
+  "devDependencies": {
+    "appium-uiautomator2-driver": "^4.2.3"
+  }
+}

@@ -1,0 +1,8 @@
+Appium-Python-Client
+Faker
+pytest
+pytest-html
+setuptools
+
+
+
