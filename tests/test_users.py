@@ -19,7 +19,7 @@ from resource import (
     log_in_user,
     delete_user,
     delete_json_file, 
-    create_user_account,
+    create_user,
     add_token_header
 )
 
@@ -46,7 +46,7 @@ def driver():
     yield driver
     driver.quit()
 
-def test_create_user_account(driver):
+def test_create_user(driver):
     # Gerando dados aleatórios para o usuário
     random_number = Faker().hexify(text='^^^^^^^^^^^^')
     user_name = Faker().name()
@@ -138,10 +138,10 @@ def test_create_user_account(driver):
 
     delete_json_file(random_number)
 
-def test_login_user_(driver):
+def test_login_user(driver):
     # Gerando dados aleatórios para o usuário
     random_number = Faker().hexify(text='^^^^^^^^^^^^')
-    create_user_account(driver, random_number)
+    create_user(driver, random_number)
 
     filepath = f"tests/fixtures/testdata-{random_number}.json"
     with open(filepath, 'r') as file:
@@ -204,10 +204,277 @@ def test_login_user_(driver):
 
     delete_json_file(random_number)
 
-def test_delete_user_(driver):
+def test_get_user(driver):
     # Gerando dados aleatórios para o usuário
     random_number = Faker().hexify(text='^^^^^^^^^^^^')
-    create_user_account(driver, random_number)
+    create_user(driver, random_number)
+    log_in_user(driver, random_number)
+
+    filepath = f"tests/fixtures/testdata-{random_number}.json"
+    with open(filepath, 'r') as file:
+        data = json.load(file)
+
+    user_token = data['user_token']
+    user_id = data['user_id']
+    user_name = data['user_name']
+    user_email = data['user_email']
+
+    wait = WebDriverWait(driver, 20)
+
+    # Seleciona método HTTP (GET)
+    wait.until(EC.visibility_of_element_located((AppiumBy.ID, "com.ab.apiclient:id/spHttpMethod"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="android:id/text1" and @text="GET"]'))).click()
+
+    # Insere a URL para obter o perfil
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.EditText[@resource-id="com.ab.apiclient:id/etUrl"]'))).send_keys("https://practice.expandtesting.com/notes/api/users/profile")
+
+    # Adiciona headers
+    add_accept_header(driver)
+    
+    # Adiciona header de autenticação
+    add_token_header(driver, random_number)
+
+    # Envia requisição
+    driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/btnSend").click()
+
+    # Visualiza aba "Raw" com resposta
+    wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
+    wait_for_result_element_and_close_ad(driver)
+    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response = json.loads(response_str)
+
+    # Validações
+    assert response["success"] is True
+    assert str(response["status"]) == "200"
+    assert response["message"] == "Profile successful"
+    assert response["data"]["id"] == user_id
+    assert response["data"]["name"] == user_name
+    assert response["data"]["email"] == user_email
+
+    # Volta para tela inicial
+    driver.press_keycode(4)
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, "//android.widget.ImageButton"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="com.ab.apiclient:id/design_menu_item_text" and @text="New Request"]'))).click()
+
+    delete_user(driver, random_number)
+
+    sleep(5)
+
+    delete_json_file(random_number)
+
+def test_update_user(driver):
+    # Gerando dados aleatórios para o usuário
+    random_number = Faker().hexify(text='^^^^^^^^^^^^')
+    create_user(driver, random_number)
+    log_in_user(driver, random_number)
+
+    filepath = f"tests/fixtures/testdata-{random_number}.json"
+    with open(filepath, 'r') as file:
+        data = json.load(file)
+
+    user_token = data['user_token']
+    user_id = data['user_id']
+    user_name = data['user_name']
+    user_email = data['user_email']
+
+    user_phone = Faker().bothify(text='############')
+    user_company = Faker().company()[:24]
+
+    wait = WebDriverWait(driver, 20)
+
+    # Seleciona método HTTP (PATCH)
+    wait.until(EC.visibility_of_element_located((AppiumBy.ID, "com.ab.apiclient:id/spHttpMethod"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="android:id/text1" and @text="PATCH"]'))).click()
+
+    # Insere a URL do endpoint
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.EditText[@resource-id="com.ab.apiclient:id/etUrl"]'))).send_keys("https://practice.expandtesting.com/notes/api/users/profile")
+
+    # Adiciona headers necessários
+    add_accept_header(driver)
+    add_content_type_header(driver)
+    add_token_header(driver, random_number)
+
+    # Localiza o campo de entrada JSON
+    json_input_field = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/etJSONData")
+
+    # Prepara o corpo JSON com os dados das variáveis
+    json_body = f'''{{
+        "name": "{user_name}",
+        "phone": "{user_phone}",
+        "company": "{user_company}"
+    }}'''
+
+    # Insere o texto formatado no campo
+    json_input_field.send_keys(json_body)
+
+    # Envia requisição
+    driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/btnSend").click()
+
+    # Visualiza aba "Raw"
+    wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
+    wait_for_result_element_and_close_ad(driver)
+    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response = json.loads(response_str)
+
+    # Valida a resposta
+    assert response["success"] is True
+    assert str(response["status"]) == "200"
+    assert response["message"] == "Profile updated successful"
+    assert response["data"]["id"] == user_id
+    assert response["data"]["name"] == user_name
+    assert response["data"]["email"] == user_email
+    assert response["data"]["phone"] == user_phone
+    assert response["data"]["company"] == user_company
+
+    # Volta à tela inicial
+    driver.press_keycode(4)
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, "//android.widget.ImageButton"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="com.ab.apiclient:id/design_menu_item_text" and @text="New Request"]'))).click()
+
+    delete_user(driver, random_number)
+
+    sleep(5)
+
+    delete_json_file(random_number)
+
+def test_update_user_password(driver):
+    # Gerando dados aleatórios para o usuário
+    random_number = Faker().hexify(text='^^^^^^^^^^^^')
+    create_user(driver, random_number)
+    log_in_user(driver, random_number)
+
+    filepath = f"tests/fixtures/testdata-{random_number}.json"
+    with open(filepath, 'r') as file:
+        data = json.load(file)
+
+    user_token = data['user_token']
+    user_password = data['user_password']
+
+    user_updated_password = Faker().password(length=12, special_chars=False, digits=True, upper_case=True, lower_case=True)
+
+    wait = WebDriverWait(driver, 20)
+
+    # Seleciona método HTTP (POST)
+    wait.until(EC.visibility_of_element_located((AppiumBy.ID, "com.ab.apiclient:id/spHttpMethod"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="android:id/text1" and @text="POST"]'))).click()
+
+    # Insere a URL do endpoint
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.EditText[@resource-id="com.ab.apiclient:id/etUrl"]'))).send_keys("https://practice.expandtesting.com/notes/api/users/change-password")
+
+    # Adiciona headers necessários
+    add_accept_header(driver)
+    add_content_type_header(driver)
+    add_token_header(driver, random_number)
+
+    # Localiza o campo de entrada JSON
+    json_input_field = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/etJSONData")
+
+    # Localiza o campo de entrada JSON
+    json_input_field = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/etJSONData")
+
+    # Prepara o corpo JSON com os dados das variáveis
+    json_body = f'''{{
+        "currentPassword": "{user_password}",
+        "newPassword": "{user_updated_password}"
+    }}'''
+
+    # Insere o texto formatado no campo
+    json_input_field.send_keys(json_body)
+
+    # Envia requisição
+    driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/btnSend").click()
+
+    # Visualiza aba "Raw"
+    wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
+    wait_for_result_element_and_close_ad(driver)
+    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response = json.loads(response_str)
+
+    # Valida a resposta
+    assert response["success"] is True
+    assert str(response["status"]) == "200"
+    assert response["message"] == "The password was successfully updated"
+
+    # Atualiza o JSON com a nova senha
+    data["user_password"] = user_updated_password
+    with open(filepath, 'w') as file:
+        json.dump(data, file)
+
+    # Volta à tela inicial
+    driver.press_keycode(4)
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, "//android.widget.ImageButton"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="com.ab.apiclient:id/design_menu_item_text" and @text="New Request"]'))).click()
+
+    # Cleanup
+    delete_user(driver, random_number)
+
+    sleep(5)
+
+    delete_json_file(random_number)
+
+def test_logout_user(driver):
+    # Gerando dados aleatórios para o usuário
+    random_number = Faker().hexify(text='^^^^^^^^^^^^')
+    create_user(driver, random_number)
+    log_in_user(driver, random_number)
+
+    filepath = f"tests/fixtures/testdata-{random_number}.json"
+    with open(filepath, 'r') as file:
+        data = json.load(file)
+
+    user_token = data['user_token']
+
+    wait = WebDriverWait(driver, 20)
+
+    # Seleciona método HTTP (DELETE)
+    wait.until(EC.visibility_of_element_located((AppiumBy.ID, "com.ab.apiclient:id/spHttpMethod"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="android:id/text1" and @text="DELETE"]'))).click()
+
+    # Insere a URL do endpoint
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.EditText[@resource-id="com.ab.apiclient:id/etUrl"]'))).send_keys("https://practice.expandtesting.com/notes/api/users/logout")
+
+    # Adiciona headers necessários
+    add_accept_header(driver)
+    add_token_header(driver, random_number)
+
+    # Limpa o campo de body se houver algo
+    json_input_field = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/etJSONData")
+    json_input_field.clear()
+
+    # Envia requisição
+    driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/btnSend").click()
+
+    # Visualiza aba "Raw"
+    wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
+    wait_for_result_element_and_close_ad(driver)
+    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response = json.loads(response_str)
+
+    # Valida a resposta
+    assert response["success"] is True
+    assert str(response["status"]) == "200"
+    assert response["message"] == "User has been successfully logged out"
+
+    # Volta à tela inicial
+    driver.press_keycode(4)
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, "//android.widget.ImageButton"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="com.ab.apiclient:id/design_menu_item_text" and @text="New Request"]'))).click()
+
+    # Cleanup
+
+    #login again to grab a new token to be used in the delete method
+    log_in_user(driver, random_number)
+
+    delete_user(driver, random_number)
+
+    sleep(5)
+
+    delete_json_file(random_number)
+
+def test_delete_user(driver):
+    # Gerando dados aleatórios para o usuário
+    random_number = Faker().hexify(text='^^^^^^^^^^^^')
+    create_user(driver, random_number)
     log_in_user(driver, random_number)
 
     filepath = f"tests/fixtures/testdata-{random_number}.json"
@@ -243,3 +510,4 @@ def test_delete_user_(driver):
     sleep(5)
 
     delete_json_file(random_number)
+

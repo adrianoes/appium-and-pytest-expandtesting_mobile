@@ -20,7 +20,6 @@ UI testing in ApiClient apk using [expandtesting](https://practice.expandtesting
 | Virtual device API              | 29             | -                                                               |
 | setuptools                      | 75.1.0         | -                                                               | 
 | Appium-Python-Client            | 5.1.1          | -                                                               | 
-| setuptools                      | 75.1.0         | -                                                               | 
 | Pytest                          | 8.3.4          | -                                                               |
 | Faker                           | 33.3.1         | -                                                               |
 | pytest-html                     | 4.1.1          | -                                                               |
@@ -70,8 +69,7 @@ Check then both to add both options in context menu.
 - Open windows prompt as admin and execute ```pip install Faker``` to install Faker library.
 - Open windows prompt as admin and execute ```pip install pytest``` to install Pytest.
 - Open windows prompt as admin and execute ```pip install pytest-html``` to install pytest-html plugin.
-- Open windows propmpt as admin and execute ```pip install setuptools``` to install setuptools package.
-- Look for Robot Framework Language Server in the extensions marketplace and install the one from Robocorp.
+- Open windows prompt as admin and execute ```pip install setuptools``` to install setuptools package.
 - Open your terminal in your project directory and execute ```npx appium``` to start appium session.
 - Execute Virtual Device Manager on Android Studio.
 - Open Appium Inspector and start the appium session. 

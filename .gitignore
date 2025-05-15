@@ -3,4 +3,4 @@ commiting.txt
 results/
 reports/
 .pytest_cache
-tests\__pycache__
+tests/__pycache__

@@ -206,7 +206,7 @@ def delete_json_file(random_number):
     else:
         print("Json file not found")
 
-def create_user_account(driver, random_number):
+def create_user(driver, random_number):
     user_name = Faker().name()
     user_email = Faker().lexify(text='??').lower() + Faker().company_email().replace("-", "")
     user_password = Faker().password(length=12, special_chars=False, digits=True, upper_case=True, lower_case=True)
