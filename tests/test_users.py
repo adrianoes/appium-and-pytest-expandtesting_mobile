@@ -3,8 +3,10 @@ import json
 import os
 from selenium.webdriver.common.keys import Keys
 from appium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.options.android import UiAutomator2Options
+from selenium.webdriver.support import expected_conditions as EC
 from subprocess import run
 from time import sleep
 from faker import Faker
@@ -16,7 +18,9 @@ from resource import (
     wait_until_element_visible,
     log_in_user,
     delete_user,
-    delete_json_file
+    delete_json_file, 
+    create_user_account,
+    add_token_header
 )
 
 @pytest.fixture
@@ -35,7 +39,10 @@ def driver():
     options.app_wait_duration = 20000
     options.uiautomator2_server_install_timeout = 60000
 
-    driver = webdriver.Remote(command_executor="http://localhost:4723", options=options)
+    # github actions
+    driver = webdriver.Remote(command_executor="http://localhost:4723/wd/hub", options=options)
+    # driver = webdriver.Remote(command_executor="http://localhost:4723", options=options)
+    #local
     yield driver
     driver.quit()
 
@@ -124,9 +131,114 @@ def test_create_user_account(driver):
     wait_until_element_visible(driver, AppiumBy.XPATH, "//android.widget.CheckedTextView[@resource-id='com.ab.apiclient:id/design_menu_item_text' and @text='New Request']")
     driver.find_element(AppiumBy.XPATH, "//android.widget.CheckedTextView[@resource-id='com.ab.apiclient:id/design_menu_item_text' and @text='New Request']").click()
 
-
     log_in_user(driver, random_number)
     delete_user(driver, random_number)
+
+    sleep(5)
+
+    delete_json_file(random_number)
+
+def test_login_user_(driver):
+    # Gerando dados aleatórios para o usuário
+    random_number = Faker().hexify(text='^^^^^^^^^^^^')
+    create_user_account(driver, random_number)
+
+    filepath = f"tests/fixtures/testdata-{random_number}.json"
+    with open(filepath, 'r') as file:
+        data = json.load(file)
+
+    user_email = data['user_email']
+    user_password = data['user_password']
+    user_id = data['user_id']
+    user_name = data['user_name']
+
+    wait = WebDriverWait(driver, 20)
+
+    wait.until(EC.visibility_of_element_located((AppiumBy.ID, "com.ab.apiclient:id/spHttpMethod"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="android:id/text1" and @text="POST"]'))).click()
+
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.EditText[@resource-id="com.ab.apiclient:id/etUrl"]'))).send_keys("https://practice.expandtesting.com/notes/api/users/login")
+
+    add_accept_header(driver)
+    add_content_type_header(driver)
+
+    # Localiza o campo de entrada JSON
+    json_input_field = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/etJSONData")
+
+    # Prepara o corpo JSON com os dados das variáveis
+    json_body = f'''{{
+        "email": "{user_email}",
+        "password": "{user_password}"
+    }}'''
+
+    # Insere o texto formatado no campo
+    json_input_field.send_keys(json_body)
+
+    driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/btnSend").click()
+
+    wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
+    wait_for_result_element_and_close_ad(driver)
+    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response = json.loads(response_str)
+
+    assert response["success"] is True
+    assert str(response["status"]) == "200"
+    assert response["message"] == "Login successful"
+    assert response["data"]["id"] == user_id
+    assert response["data"]["name"] == user_name
+    assert response["data"]["email"] == user_email
+
+    user_token = response["data"]["token"]
+    data["user_token"] = user_token
+
+    with open(filepath, 'w') as file:
+        json.dump(data, file)
+
+    driver.press_keycode(4)
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, "//android.widget.ImageButton"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="com.ab.apiclient:id/design_menu_item_text" and @text="New Request"]'))).click()
+
+    delete_user(driver, random_number)
+
+    sleep(5)
+
+    delete_json_file(random_number)
+
+def test_delete_user_(driver):
+    # Gerando dados aleatórios para o usuário
+    random_number = Faker().hexify(text='^^^^^^^^^^^^')
+    create_user_account(driver, random_number)
+    log_in_user(driver, random_number)
+
+    filepath = f"tests/fixtures/testdata-{random_number}.json"
+    with open(filepath, 'r') as file:
+        data = json.load(file)
+
+    user_token = data['user_token']
+    wait = WebDriverWait(driver, 20)
+
+    wait.until(EC.visibility_of_element_located((AppiumBy.ID, "com.ab.apiclient:id/spHttpMethod"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="android:id/text1" and @text="DELETE"]'))).click()
+
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.EditText[@resource-id="com.ab.apiclient:id/etUrl"]'))).send_keys("https://practice.expandtesting.com/notes/api/users/delete-account")
+
+    add_accept_header(driver)
+    add_token_header(driver, random_number)
+
+    driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/btnSend").click()
+
+    wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
+    wait_for_result_element_and_close_ad(driver)
+    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response = json.loads(response_str)
+
+    assert response["success"] is True
+    assert str(response["status"]) == "200"
+    assert response["message"] == "Account successfully deleted"
+
+    driver.press_keycode(4)
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, "//android.widget.ImageButton"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="com.ab.apiclient:id/design_menu_item_text" and @text="New Request"]'))).click()
 
     sleep(5)
 
