@@ -287,8 +287,169 @@ def create_user(driver, random_number):
     wait_until_element_visible(driver, AppiumBy.XPATH, "//android.widget.CheckedTextView[@resource-id='com.ab.apiclient:id/design_menu_item_text' and @text='New Request']")
     driver.find_element(AppiumBy.XPATH, "//android.widget.CheckedTextView[@resource-id='com.ab.apiclient:id/design_menu_item_text' and @text='New Request']").click()
 
+def create_note(driver, random_number):
+    filepath = f"tests/fixtures/testdata-{random_number}.json"
+    with open(filepath, 'r') as file:
+        data = json.load(file)
 
+    user_token = data['user_token']
+    user_id = data['user_id']
 
+    note_title = Faker().sentence(4)
+    note_description = Faker().sentence(5)
+    note_category = Faker().random_element(elements=('Home', 'Personal', 'Work'))
+
+    wait = WebDriverWait(driver, 20)
+
+    # Seleciona método HTTP (POST)
+    wait.until(EC.visibility_of_element_located((AppiumBy.ID, "com.ab.apiclient:id/spHttpMethod"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="android:id/text1" and @text="POST"]'))).click()
+
+    # Insere a URL do endpoint
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.EditText[@resource-id="com.ab.apiclient:id/etUrl"]'))).send_keys("https://practice.expandtesting.com/notes/api/notes")
+
+    # Adiciona headers necessários
+    add_accept_header(driver)
+    add_content_type_header(driver)
+    add_token_header(driver, random_number)
+
+    # Localiza o campo de entrada JSON
+    json_input_field = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/etJSONData")
+
+    # Prepara o corpo JSON com os dados da nota
+    json_body = f'''{{
+        "title": "{note_title}",
+        "description": "{note_description}",
+        "category": "{note_category}"
+    }}'''
+
+    # Insere o corpo JSON no campo apropriado
+    json_input_field.clear()
+    json_input_field.send_keys(json_body)
+
+    # Envia requisição
+    driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/btnSend").click()
+
+    # Visualiza aba "Raw"
+    wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
+    wait_for_result_element_and_close_ad(driver)
+    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response = json.loads(response_str)
+
+    # Valida a resposta principal
+    assert response["success"] is True
+    assert str(response["status"]) == "200"
+    assert response["message"] == "Note successfully created"
+
+    note_data = response["data"]
+
+    # Valida que os dados retornados correspondem ao esperado
+    assert note_data["user_id"] == user_id
+    assert note_data["title"] == note_title
+    assert note_data["description"] == note_description
+    assert note_data["category"] == note_category
+    assert note_data["completed"] is False
+
+    # Atualiza o JSON com os dados da nota
+    data.update({
+        "note_id": note_data["id"],
+        "note_title": note_data["title"],
+        "note_description": note_data["description"],
+        "note_category": note_data["category"],
+        "note_completed": note_data["completed"],
+        "note_created_at": note_data["created_at"],
+        "note_updated_at": note_data["updated_at"]
+    })
+
+    with open(filepath, 'w') as file:
+        json.dump(data, file)
+
+    # Volta à tela inicial
+    driver.press_keycode(4)
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, "//android.widget.ImageButton"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="com.ab.apiclient:id/design_menu_item_text" and @text="New Request"]'))).click()
+
+def create_2nd_note(driver, random_number):
+    filepath = f"tests/fixtures/testdata-{random_number}.json"
+    with open(filepath, 'r') as file:
+        data = json.load(file)
+
+    user_token = data['user_token']
+    user_id = data['user_id']
+
+    note_title_2 = Faker().sentence(4)
+    note_description_2 = Faker().sentence(5)
+    note_category_2 = Faker().random_element(elements=('Home', 'Personal', 'Work'))
+
+    wait = WebDriverWait(driver, 20)
+
+    # Seleciona método HTTP (POST)
+    wait.until(EC.visibility_of_element_located((AppiumBy.ID, "com.ab.apiclient:id/spHttpMethod"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="android:id/text1" and @text="POST"]'))).click()
+
+    # Insere a URL do endpoint
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.EditText[@resource-id="com.ab.apiclient:id/etUrl"]'))).send_keys("https://practice.expandtesting.com/notes/api/notes")
+
+    # Adiciona headers necessários
+    add_accept_header(driver)
+    add_content_type_header(driver)
+    add_token_header(driver, random_number)
+
+    # Localiza o campo de entrada JSON
+    json_input_field = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/etJSONData")
+
+    # Prepara o corpo JSON com os dados da nota
+    json_body = f'''{{
+        "title": "{note_title_2}",
+        "description": "{note_description_2}",
+        "category": "{note_category_2}"
+    }}'''
+
+    # Insere o corpo JSON no campo apropriado
+    json_input_field.clear()
+    json_input_field.send_keys(json_body)
+
+    # Envia requisição
+    driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/btnSend").click()
+
+    # Visualiza aba "Raw"
+    wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
+    wait_for_result_element_and_close_ad(driver)
+    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response = json.loads(response_str)
+
+    # Valida a resposta principal
+    assert response["success"] is True
+    assert str(response["status"]) == "200"
+    assert response["message"] == "Note successfully created"
+
+    note_data = response["data"]
+
+    # Valida que os dados retornados correspondem ao esperado
+    assert note_data["user_id"] == user_id
+    assert note_data["title"] == note_title_2
+    assert note_data["description"] == note_description_2
+    assert note_data["category"] == note_category_2
+    assert note_data["completed"] is False
+
+    # Atualiza o JSON com os dados da segunda nota
+    data.update({
+        "note_id_2": note_data["id"],
+        "note_title_2": note_data["title"],
+        "note_description_2": note_data["description"],
+        "note_category_2": note_data["category"],
+        "note_completed_2": note_data["completed"],
+        "note_created_at_2": note_data["created_at"],
+        "note_updated_at_2": note_data["updated_at"]
+    })
+
+    with open(filepath, 'w') as file:
+        json.dump(data, file)
+
+    # Volta à tela inicial
+    driver.press_keycode(4)
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, "//android.widget.ImageButton"))).click()
+    wait.until(EC.visibility_of_element_located((AppiumBy.XPATH, '//android.widget.CheckedTextView[@resource-id="com.ab.apiclient:id/design_menu_item_text" and @text="New Request"]'))).click()
 
 
 
