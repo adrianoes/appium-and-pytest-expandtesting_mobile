@@ -314,7 +314,8 @@ def test_login_user_br(driver):
 
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     assert response["success"] is False
@@ -373,7 +374,8 @@ def test_login_user_ur(driver):
 
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     assert response["success"] is False
@@ -486,7 +488,8 @@ def test_get_user_ur(driver):
     # Visualiza aba "Raw" com resposta
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Validações
@@ -631,7 +634,8 @@ def test_update_user_br(driver):
     # Visualiza aba "Raw"
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Valida a resposta
@@ -845,7 +849,8 @@ def test_update_user_password_br(driver):
     # Visualiza aba "Raw"
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Valida a resposta
@@ -915,7 +920,8 @@ def test_update_user_password_ur(driver):
     # Visualiza aba "Raw"
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Valida a resposta
@@ -1029,7 +1035,8 @@ def test_logout_user_ur(driver):
     # Visualiza aba "Raw"
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Valida a resposta
@@ -1113,7 +1120,8 @@ def test_delete_user_ur(driver):
 
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Valida a resposta

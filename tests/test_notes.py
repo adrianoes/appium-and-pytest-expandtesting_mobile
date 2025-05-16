@@ -194,7 +194,8 @@ def test_create_note_br(driver):
     # Visualiza aba "Raw"
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Valida a resposta principal
@@ -265,7 +266,8 @@ def test_create_note_ur(driver):
     # Visualiza aba "Raw"
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Valida a resposta principal
@@ -395,7 +397,8 @@ def test_get_notes_ur(driver):
     # Visualiza aba "Raw"
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Validação da resposta principal
@@ -532,7 +535,8 @@ def test_get_note_ur(driver):
     # Visualiza aba "Raw"
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Validação da resposta principal
@@ -722,7 +726,8 @@ def test_update_note_br(driver):
     # Visualiza aba "Raw"
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Valida resposta principal
@@ -805,7 +810,8 @@ def test_update_note_ur(driver):
     # Visualiza aba "Raw"
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Valida resposta principal
@@ -979,7 +985,8 @@ def test_update_note_status_br(driver):
     # Visualiza aba "Raw"
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Valida resposta principal
@@ -1056,7 +1063,8 @@ def test_update_note_status_ur(driver):
     # Visualiza aba "Raw"
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Valida resposta principal
@@ -1176,7 +1184,8 @@ def test_delete_note_br(driver):
     # Visualiza aba "Raw"
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Valida resposta principal
@@ -1232,7 +1241,8 @@ def test_delete_note_ur(driver):
     # Visualiza aba "Raw"
     # wait.until(EC.visibility_of_element_located((AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")'))).click()
     # wait_for_result_element_and_close_ad(driver)
-    response_str = driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/tvResult").text
+    response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
+    response_str = response_text_element.text
     response = json.loads(response_str)
 
     # Valida resposta principal
