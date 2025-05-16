@@ -712,7 +712,7 @@ def test_update_user_ur(driver):
     # Valida a resposta
     assert response["success"] is False
     assert str(response["status"]) == "401"
-    assert response["message"] == "User name must be between 4 and 30 characters"
+    assert response["message"] == "Access token is not valid or has expired, you will need to login"
 
     # Volta à tela inicial
     driver.press_keycode(4)
