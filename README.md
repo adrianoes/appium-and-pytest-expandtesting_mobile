@@ -9,7 +9,7 @@ UI testing in ApiClient apk using [expandtesting](https://practice.expandtesting
 | Visual Studio Code              | 1.89.1         | -                                                               |
 | Node.js                         | 22.11.0        | -                                                               |
 | Python                          | 3.13.1         | -                                                               |
-| JDK                             | 23             | -                                                               |
+| JDK                             | 21             | -                                                               |
 | Android Studio                  | 2024.2.1.11    | -                                                               |
 | ApiClient apk                   | 2.4.7          | -                                                               |
 | Appium                          | 2.16.2         | -                                                               |
