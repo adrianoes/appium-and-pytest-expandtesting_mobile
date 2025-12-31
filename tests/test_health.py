@@ -30,8 +30,8 @@ def driver():
     options.uiautomator2_server_install_timeout = 60000
 
     # github actions
-    # driver = webdriver.Remote(command_executor="http://localhost:4723/wd/hub", options=options)
-    driver = webdriver.Remote(command_executor="http://localhost:4723", options=options)
+    driver = webdriver.Remote(command_executor="http://localhost:4723/wd/hub", options=options)
+    # driver = webdriver.Remote(command_executor="http://localhost:4723", options=options)
     #local
     yield driver
     driver.quit()
