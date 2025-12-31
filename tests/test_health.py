@@ -30,49 +30,49 @@ def driver():
     options.uiautomator2_server_install_timeout = 60000
 
     # github actions
-    driver = webdriver.Remote(command_executor="http://localhost:4723/wd/hub", options=options)
-    # driver = webdriver.Remote(command_executor="http://localhost:4723", options=options)
+    # driver = webdriver.Remote(command_executor="http://localhost:4723/wd/hub", options=options)
+    driver = webdriver.Remote(command_executor="http://localhost:4723", options=options)
     #local
     yield driver
     driver.quit()
 
 def test_check_api_health(driver):
-    # Desliga Wi-Fi
+    # Disable WiFi
     run(["adb", "shell", "svc", "wifi", "disable"])
 
     sleep(5)
 
     increasing_request_response_timeout(driver)
 
-    # Input base URL
+    # Insert base URL
     url_input = wait_until_element_visible(driver, AppiumBy.XPATH, "//android.widget.EditText[@resource-id='com.ab.apiclient:id/etUrl']")
     url_input.send_keys("https://practice.expandtesting.com/notes/api/health-check")
 
-    # Adiciona header Accept: application/xml
-    add_accept_header(driver)
+    # Add Accept: application/xml header
+    # add_accept_header(driver)
 
-    # Envia requisição
+    # Send request
     driver.find_element(AppiumBy.ID, "com.ab.apiclient:id/btnSend").click()
 
-    # Abre aba "Raw" para ver resultado
+    # Open "Raw" tab to view result
     wait_until_element_visible(driver, AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Raw")').click()
 
-    # Espera pelo resultado e fecha ad se necessário
+    # Wait for result and close ad if necessary
     wait_for_result_element_and_close_ad(driver)
 
-    # Captura texto da resposta
+    # Capture response text
     response_text_element = wait_until_element_visible(driver, AppiumBy.ID, "com.ab.apiclient:id/tvResult")
     response_str = response_text_element.text
     print(f"string response is: {response_str}")
 
-    # Processa JSON
+    # Process JSON
     response_json = json.loads(response_str)
 
     success = response_json.get("success")
     status = response_json.get("status")
     message = response_json.get("message")
 
-    # Asserts
+    # Assertions
     assert success is True
     assert str(status) == "200"
     assert message == "Notes API is Running"

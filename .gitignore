@@ -4,3 +4,6 @@ results/
 reports/
 .pytest_cache
 tests/__pycache__
+.env
+test_artifacts
+__pycache__

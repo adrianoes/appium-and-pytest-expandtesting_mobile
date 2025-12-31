@@ -21,6 +21,13 @@ jobs:
         run:
           pip install -r requirements.txt
 
+      - name: Create test artifacts directory
+        run: |
+          mkdir -p test_artifacts/screenshots
+          mkdir -p test_artifacts/videos
+          mkdir -p test_artifacts/logs
+          mkdir -p reports
+
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
@@ -61,7 +68,15 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Run Android Emulator
+      - name: Setup JIRA credentials
+        run: |
+          echo "JIRA_BASE_URL=${{ secrets.JIRA_BASE_URL }}" >> .env
+          echo "JIRA_EMAIL=${{ secrets.JIRA_EMAIL }}" >> .env
+          echo "JIRA_API_SECRET=${{ secrets.JIRA_API_SECRET }}" >> .env
+          echo "JIRA_PROJECT_KEY=${{ secrets.JIRA_PROJECT_KEY }}" >> .env
+          echo "JIRA_ISSUE_TYPE=${{ secrets.JIRA_ISSUE_TYPE }}" >> .env
+
+      - name: Run Android Emulator with Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
@@ -70,11 +85,38 @@ jobs:
           profile: pixel_4
           script: |
             avdmanager list device
-            pytest ./tests -v --html=./reports/report.html
+            python run_tests_with_jira.py
 
-      - name: Upload test results
+      - name: Upload test artifacts to GitHub
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: reports
-          path: reports
+          name: test-artifacts
+          path: |
+            test_artifacts/
+            reports/
+          retention-days: 30
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: test_artifacts/screenshots/
+          retention-days: 30
+
+      - name: Upload logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: logs
+          path: test_artifacts/logs/
+          retention-days: 30
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: html-report
+          path: reports/
+          retention-days: 30

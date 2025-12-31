@@ -3,6 +3,8 @@ Faker
 pytest
 pytest-html
 setuptools
+requests
+python-dotenv
 
 
 
